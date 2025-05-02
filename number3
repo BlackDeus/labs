@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Лабораторна робота №3</title>
+</head>
+<body>
+
+  <h2>Завдання 1</h2>
+
+  <!-- 1. Текст з розміром шрифту -->
+  <input type="text" id="textInput1" placeholder="Введіть текст">
+  <input type="text" id="fontSizeInput" placeholder="Розмір шрифту (наприклад: 24px)">
+  <button onclick="printTextWithSize(
+    document.getElementById('textInput1').value,
+    document.getElementById('fontSizeInput').value
+  )">Вивести текст</button>
+
+  <!-- 2. Таблиця з рядків -->
+  <br><br>
+  <textarea id="tableRowsInput" rows="3" cols="40" placeholder="Введіть рядки (по одному на рядок)"></textarea><br>
+  <button onclick="createTableFromStrings(
+    ...document.getElementById('tableRowsInput').value.split('\n')
+  )">Створити таблицю</button>
+
+  <!-- 3. Заголовки -->
+  <br><br>
+  <input type="number" id="headerCount" placeholder="Кількість заголовків">
+  <button onclick="createHeaders(parseInt(document.getElementById('headerCount').value))">Створити заголовки</button>
+
+  <!-- 4. Аналіз аргументів -->
+  <br><br>
+  <input type="text" id="argsInput" placeholder="Введіть аргументи через кому (слова та числа)">
+  <button onclick="{
+    const args = document.getElementById('argsInput').value.split(',').map(a => isNaN(a) ? a.trim() : Number(a));
+    someFunction(...args);
+  }">Аналізувати</button>
+
+  <h2>Завдання 2</h2>
+
+  <!-- Поточна дата -->
+  <button onclick="showCurrentDate()">Показати поточну дату</button>
+  <div id="currentDate" style="margin: 10px 0; font-weight: bold;"></div>
+
+  <!-- Аналіз дати -->
+  <input id="dateInput" placeholder="Введіть дату (дд.мм.рррр або ін.)" />
+  <button onclick="analyzeDate(document.getElementById('dateInput').value)">Аналізувати дату</button>
+  <div id="analyzeResult" style="margin: 10px 0; font-weight: bold;"></div>
+
+  <h2>Завдання 3</h2>
+
+  <!-- Find Dates -->
+  <textarea id="regexText" rows="3" cols="40" placeholder="Введіть текст з датами (РРРР-ММ-ДД)"></textarea><br>
+  <button onclick="alert(findDates(document.getElementById('regexText').value))">Знайти дати</button>
+
+  <!-- To Camel Case -->
+  <br><br>
+  <input type="text" id="snakeCaseInput" placeholder="snake_case">
+  <button onclick="alert(toCamelCase(document.getElementById('snakeCaseInput').value))">To camelCase</button>
+
+  <!-- To Snake Case -->
+  <br><br>
+  <input type="text" id="camelCaseInput" placeholder="camelCase">
+  <button onclick="alert(toSnakeCase(document.getElementById('camelCaseInput').value))">To snake_case</button>
+
+  <!-- Find Hex Color -->
+  <br><br>
+  <textarea id="colorText" rows="2" cols="40" placeholder="Введіть текст з кольорами #ABC / #AABBCC"></textarea><br>
+  <button onclick="alert(findHexColor(document.getElementById('colorText').value))">Знайти кольори</button>
+
+  <script>
+    // 1. Текст з розміром шрифту
+    function printTextWithSize(text, size) {
+      const div = document.createElement('div');
+      div.style.fontSize = size;
+      div.textContent = text;
+      document.body.appendChild(div);
+    }
+
+    // 2. Таблиця з рядків
+    function createTableFromStrings(...rows) {
+      const table = document.createElement('table');
+      table.border = 1;
+      rows.forEach(row => {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.textContent = row;
+        tr.appendChild(td);
+        table.appendChild(tr);
+      });
+      document.body.appendChild(table);
+    }
+
+    // 3. Заголовки
+    function createHeaders(N) {
+      for (let i = 1; i <= N; i++) {
+        const h2 = document.createElement('h2');
+        h2.textContent = `Header${i}`;
+        document.body.appendChild(h2);
+      }
+    }
+
+    // 4. Аналіз аргументів
+    function someFunction(...args) {
+      const numbers = args.filter(x => typeof x === 'number');
+      const words = args.filter(x => typeof x === 'string');
+      const sum = numbers.reduce((a, b) => a + b, 0);
+      const sentence = words.join(' ');
+      alert("Сума чисел: " + sum + "\nРечення: " + sentence);
+    }
+
+    // Поточна дата
+    function showCurrentDate() {
+      const now = new Date();
+      const days = ['неділя','понеділок','вівторок','середа','четвер','п’ятниця','субота'];
+      const months = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+      const dateStr = `Дата: ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} року`;
+      const dayStr = `День тижня: ${days[now.getDay()]}`;
+      const timeStr = `Час: ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+      document.getElementById("currentDate").innerHTML = `${dateStr}<br>${dayStr}<br>${timeStr}`;
+    }
+
+    // Аналіз введеної дати
+    function analyzeDate(input) {
+      const [d, m, y] = input.replace(/[-\/]/g, '.').split('.').map(Number);
+      const inputDate = new Date(y, m - 1, d);
+      const now = new Date();
+      const diff = Math.floor((now - inputDate) / (1000 * 60 * 60 * 24));
+      let result = '';
+      if (diff === 0) result = 'Сьогодні';
+      else if (diff === 1) result = 'Вчора';
+      else if (diff >= 2 && diff <= 6) result = `${diff} дні(в) тому`;
+      else if (diff === 7) result = 'Тиждень тому';
+      else if (diff >= 365) result = 'Рік тому';
+      else result = `${y}.${String(m).padStart(2, '0')}.${String(d).padStart(2, '0')}`;
+      document.getElementById("analyzeResult").innerText = result;
+    }
+
+    // Регулярні вирази
+    function findDates(text) {
+      const regex = /\b(20\d{2}|19\d{2})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])\b/g;
+      return text.match(regex) || [];
+    }
+
+    function toCamelCase(str) {
+      return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+    }
+
+    function toSnakeCase(str) {
+      return str.replace(/([A-Z])/g, '_$1').toLowerCase();
+    }
+
+    function findHexColor(text) {
+      const regex = /#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b/;
+      const match = text.match(regex);
+      return match ? match[0] : null;
+    }
+  </script>
+
+</body>
+</html>
