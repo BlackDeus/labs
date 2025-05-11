@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Лабораторна робота №4 - DOM</title>
+  <style>
+    .active-img {
+      filter: grayscale(0%);
+      opacity: 1;
+    }
+    .inactive-img {
+      filter: grayscale(100%);
+      opacity: 0.5;
+    }
+    .focused {
+      border: 2px solid blue;
+    }
+    .rotatable {
+      transition: transform 0.3s, width 0.3s, height 0.3s;
+      display: inline-block;
+    }
+    .slider {
+      width: 300px;
+      height: 200px;
+      overflow: hidden;
+      position: relative;
+    }
+    .slider img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      transition: left 0.5s;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Лабораторна робота №4 - DOM</h1>
+
+<!-- Завдання 1 -->
+<section>
+  <h2>Завдання 1</h2>
+  <label><input type="checkbox" class="z1"> Варіант 1</label>
+  <label><input type="checkbox" class="z1"> Варіант 2</label>
+  <label><input type="checkbox" class="z1"> Варіант 3</label>
+  <button onclick="z1()">Показати вибране</button>
+  <p id="z1-output"></p>
+</section>
+
+<!-- Завдання 2 -->
+<section>
+  <h2>Завдання 2</h2>
+  <label><input type="checkbox" class="z2" value="email1@example.com"> email1@example.com</label>
+  <label><input type="checkbox" class="z2" value="email2@example.com"> email2@example.com</label>
+  <label><input type="checkbox" class="z2" value="email3@example.com"> email3@example.com</label>
+  <div id="z2-output"></div>
+</section>
+
+<!-- Завдання 3 -->
+<section>
+  <h2>Завдання 3</h2>
+  <p id="z3-score">Рахунок: 0</p>
+  <p id="z3-task"></p>
+  <div id="z3-options"></div>
+  <p id="z3-result"></p>
+  <button onclick="nextZ3()">Наступне завдання</button>
+</section>
+
+<!-- Завдання 4 -->
+<section>
+  <h2>Завдання 4</h2>
+  <p id="z4-score">Рахунок: 0</p>
+  <p id="z4-task"></p>
+  <input id="z4-answer" type="number">
+  <button onclick="checkZ4()">Перевірити</button>
+  <p id="z4-result"></p>
+  <button onclick="nextZ4()">Наступне завдання</button>
+</section>
+
+<!-- Завдання 5 -->
+<section>
+  <h2>Завдання 5</h2>
+  <img src="https://cdn.discordapp.com/avatars/306802366693244928/b3e8fb76b2323e4193828ea8b582c914.webp?size=100" class="inactive-img z5" onclick="toggleImage(this)">
+  <img src="https://cdn.discordapp.com/avatars/302490629508956160/bb45d34fbc87dac3ec91e6f4801f3e72.webp?size=100" class="inactive-img z5" onclick="toggleImage(this)">
+</section>
+
+<!-- Завдання 6 -->
+<section>
+  <h2>Завдання 6</h2>
+  <div class="form-section"><input type="text" onfocus="focusSection(this)"></div>
+  <div class="form-section"><input type="text" onfocus="focusSection(this)"></div>
+</section>
+
+<!-- Завдання 7 -->
+<section>
+  <h2>Завдання 7</h2>
+  <div id="z7-block" class="rotatable" style="width:100px;height:100px;background:gray;"></div><br>
+  <button onclick="resizeBlock()">Змінити розмір</button>
+  <button onclick="rotateBlock()">Повернути</button>
+</section>
+
+<!-- Завдання 8 -->
+<section>
+  <h2>Завдання 8</h2>
+  <img id="z8-img" src="https://cdn.discordapp.com/avatars/306802366693244928/b3e8fb76b2323e4193828ea8b582c914.webp?size=100" width="100" height="100">
+  <button onclick="toggleImageSize()">Змінити розмір</button>
+</section>
+
+<!-- Завдання 9 -->
+<section>
+  <h2>Завдання 9</h2>
+  <table border="1">
+    <tr>
+      <td>Товар 1</td>
+      <td><button onclick="addToCart('Товар 1')">Замовити</button></td>
+    </tr>
+    <tr>
+      <td>Товар 2</td>
+      <td><button onclick="addToCart('Товар 2')">Замовити</button></td>
+    </tr>
+    <tr>
+      <td>Товар 3</td>
+      <td><button onclick="addToCart('Товар 3')">Замовити</button></td>
+    </tr>
+  </table>
+
+  <h3>Кошик</h3>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Назва товару</th>
+        <th>Кількість</th>
+      </tr>
+    </thead>
+    <tbody id="cart-table"></tbody>
+  </table>
+</section>
+
+
+<!-- Завдання 10 -->
+<section>
+  <h2>Завдання 10</h2>
+  <div class="slider" onclick="nextSlide()">
+    <img src="https://cdn.discordapp.com/avatars/306802366693244928/b3e8fb76b2323e4193828ea8b582c914.webp?size=1024" style="left: 0;">
+    <img src="https://cdn.discordapp.com/avatars/302490629508956160/bb45d34fbc87dac3ec91e6f4801f3e72.webp?size=1024" style="left: 100%;">
+    <img src="https://cdn.discordapp.com/avatars/293035961980420097/ed3d581e8e9ad8c37eec446e898712a6.webp?size=1024" style="left: 200%;">
+  </div>
+</section>
+
+<script>
+  // Завдання 1
+  function z1() {
+    const selected = [...document.querySelectorAll('.z1:checked')].map(el => el.parentElement.textContent.trim());
+    document.getElementById('z1-output').textContent = selected.join(', ');
+  }
+
+  // Завдання 2
+  document.querySelectorAll('.z2').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const output = document.getElementById('z2-output');
+      const emails = [...document.querySelectorAll('.z2:checked')].map(cb => cb.value);
+      output.textContent = emails.join(', ');
+    });
+  });
+
+  // Завдання 3
+  let z3Score = 0, z3Answer;
+  function nextZ3() {
+    const a = Math.floor(Math.random() * 10);
+    const b = Math.floor(Math.random() * 10);
+    z3Answer = a * b;
+    document.getElementById('z3-task').textContent = `${a} * ${b} = ?`;
+    const options = [z3Answer, z3Answer + 1, z3Answer - 1].sort(() => Math.random() - 0.5);
+    document.getElementById('z3-options').innerHTML = options.map(val =>
+      `<label><input type="radio" name="z3" onclick="checkZ3(${val})">${val}</label>`).join('<br>');
+    document.getElementById('z3-result').textContent = '';
+  }
+  function checkZ3(val) {
+    if (val === z3Answer) {
+      document.getElementById('z3-result').textContent = 'Правильно!';
+      z3Score++;
+    } else {
+      document.getElementById('z3-result').textContent = 'Неправильно!';
+    }
+    document.getElementById('z3-score').textContent = `Рахунок: ${z3Score}`;
+  }
+
+  // Завдання 4
+  let z4Score = 0, z4Answer;
+  function nextZ4() {
+    const a = Math.floor(Math.random() * 10);
+    const b = Math.floor(Math.random() * 10);
+    z4Answer = a * b;
+    document.getElementById('z4-task').textContent = `${a} * ${b} = ?`;
+    document.getElementById('z4-result').textContent = '';
+  }
+  function checkZ4() {
+    const userAns = +document.getElementById('z4-answer').value;
+    if (userAns === z4Answer) {
+      document.getElementById('z4-result').textContent = 'Правильно!';
+      z4Score++;
+    } else {
+      document.getElementById('z4-result').textContent = 'Неправильно!';
+    }
+    document.getElementById('z4-score').textContent = `Рахунок: ${z4Score}`;
+  }
+
+  // Завдання 5
+  function toggleImage(img) {
+    img.classList.toggle('active-img');
+    img.classList.toggle('inactive-img');
+  }
+
+  // Завдання 6
+  function focusSection(input) {
+    document.querySelectorAll('.form-section').forEach(s => s.classList.remove('focused'));
+    input.parentElement.classList.add('focused');
+  }
+
+  // Завдання 7
+  let rotated = 0, resized = false;
+  function rotateBlock() {
+    rotated += 45;
+    document.getElementById('z7-block').style.transform = `rotate(${rotated}deg)`;
+  }
+  function resizeBlock() {
+    const block = document.getElementById('z7-block');
+    if (!resized) {
+      block.style.width = '200px';
+      block.style.height = '200px';
+    } else {
+      block.style.width = '100px';
+      block.style.height = '100px';
+    }
+    resized = !resized;
+  }
+
+  // Завдання 8
+  let enlarged = false;
+  function toggleImageSize() {
+    const img = document.getElementById('z8-img');
+    if (!enlarged) {
+      img.width *= 2;
+      img.height *= 2;
+    } else {
+      img.width /= 2;
+      img.height /= 2;
+    }
+    enlarged = !enlarged;
+  }
+
+  // Завдання 9
+  const cartItems = {};
+
+function addToCart(product) {
+  if (cartItems[product]) {
+    cartItems[product]++;
+  } else {
+    cartItems[product] = 1;
+  }
+
+  updateCartTable();
+}
+
+function updateCartTable() {
+  const cartTable = document.getElementById('cart-table');
+  cartTable.innerHTML = '';
+
+  for (const [product, quantity] of Object.entries(cartItems)) {
+    const row = document.createElement('tr');
+
+    const nameCell = document.createElement('td');
+    nameCell.textContent = product;
+
+    const qtyCell = document.createElement('td');
+    qtyCell.textContent = quantity;
+
+    row.appendChild(nameCell);
+    row.appendChild(qtyCell);
+    cartTable.appendChild(row);
+  }
+}
+
+
+  // Завдання 10
+  let slideIndex = 0;
+  function nextSlide() {
+    const slides = document.querySelectorAll('.slider img');
+    slideIndex = (slideIndex + 1) % slides.length;
+    slides.forEach((img, i) => img.style.left = `${(i - slideIndex) * 100}%`);
+  }
+
+  // Ініціалізація перших питань
+  nextZ3();
+  nextZ4();
+</script>
+
+</body>
+</html>
