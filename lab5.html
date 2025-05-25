@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Лабораторна №5. Події</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }
+    .square { width: 20px; height: 20px; display: inline-block; margin: 1px; }
+    .palette-color { width: 30px; height: 30px; display: inline-block; border: 1px solid #000; cursor: pointer; }
+    .selected { outline: 3px solid blue; }
+    .card { width: 80px; height: 120px; background: gray; margin: 5px; display: inline-block; perspective: 1000px; cursor: pointer; }
+    .card-inner { width: 100%; height: 100%; transition: transform 1s; transform-style: preserve-3d; position: relative; }
+    .card.flip .card-inner { transform: rotateY(180deg); }
+    .card-front, .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; }
+    .card-back { background: red; transform: rotateY(180deg); }
+    .canvas { display: grid; grid-template-columns: repeat(10, 20px); width: 200px; margin-top: 10px; }
+    .draggable { width: 40px; height: 40px; background: coral; position: absolute; cursor: grab; }
+    #container { position: relative; width: 300px; height: 300px; border: 2px dashed #aaa; overflow: hidden; }
+    .message, .book { padding: 10px; border: 1px solid #ccc; margin: 5px; }
+    .hover-button { position: relative; margin-top: 20px; height: 100px; width: 200px; border: 1px solid #000; overflow: hidden; }
+    .hover-button button { position: absolute; }
+  </style>
+</head>
+<body>
+  <h1>Завдання 1</h1>
+  <table id="userTable">
+    <thead><tr><th>#</th><th>Ім’я</th><th>Прізвище</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <form id="userForm">
+    <input placeholder="Ім’я" id="firstName">
+    <input placeholder="Прізвище" id="lastName">
+    <button type="submit">Додати</button>
+  </form>
+
+  <h1>Завдання 2</h1>
+  <textarea id="binaryInput"></textarea>
+  <div id="binaryOutput"></div>
+
+  <h1>Завдання 3</h1>
+  <div>
+    <div class="palette-color" style="background: red"></div>
+    <div class="palette-color" style="background: green"></div>
+    <div class="palette-color" style="background: blue"></div>
+  </div>
+  <div id="rectangle" style="width:100px;height:50px;border:1px solid #000;margin-top:10px;"></div>
+
+  <h1>Завдання 4</h1>
+  <div id="editableBlocks"></div>
+  <button onclick="addEditableBlock()">Додати блок</button>
+
+  <h1>Завдання 5</h1>
+  <div id="colorPalette">
+    <div class="palette-color" style="background: red"></div>
+    <div class="palette-color" style="background: green"></div>
+    <div class="palette-color" style="background: blue"></div>
+  </div>
+  <div class="canvas" id="paintCanvas"></div>
+
+  <h1>Завдання 6</h1>
+  <div id="cards"></div>
+
+  <h1>Завдання 7</h1>
+  <div id="container">
+    <div class="draggable" id="dragBox"></div>
+  </div>
+
+  <h1>Завдання 8</h1>
+  <form id="messageForm">
+    <input id="nickname" placeholder="Нікнейм">
+    <input id="messageText" placeholder="Повідомлення">
+    <button>Додати</button>
+  </form>
+  <div id="forumMessages"></div>
+
+  <h1>Завдання 9</h1>
+  <div id="bookList">
+    <div class="book">1 «Володар кілець»</div>
+    <div class="book">2 «Гордість і упередження»</div>
+    <div class="book">3 «Темні початки»</div>
+    <div class="book">4 «Автостопом по галактиці»</div>
+    <div class="book">5 «Гаррі Поттер»</div>
+    <div class="book">6 «Вбити пересмішника»</div>
+  </div>
+
+  <h1>Завдання 10</h1>
+  <div class="hover-button" id="hoverArea">
+    <button id="escapeBtn">Клікни мене</button>
+  </div>
+
+  <script>
+    // Task 1
+    document.getElementById('userForm').onsubmit = e => {
+      e.preventDefault();
+      const table = document.querySelector('#userTable tbody');
+      const row = table.insertRow();
+      row.insertCell(0).textContent = table.rows.length;
+      row.insertCell(1).textContent = document.getElementById('firstName').value;
+      row.insertCell(2).textContent = document.getElementById('lastName').value;
+    };
+
+    // Task 2
+    document.getElementById('binaryInput').oninput = function () {
+      const output = document.getElementById('binaryOutput');
+      output.innerHTML = '';
+      [...this.value].forEach(bit => {
+        const square = document.createElement('div');
+        square.className = 'square';
+        square.style.background = bit === '1' ? '#000' : '#fff';
+        output.appendChild(square);
+      });
+    };
+
+    // Task 3
+    const palette = document.querySelectorAll('.palette-color');
+    const rect = document.getElementById('rectangle');
+    palette.forEach(colorDiv => {
+      colorDiv.onclick = () => {
+        colorDiv.classList.toggle('selected');
+        const selected = [...document.querySelectorAll('.palette-color.selected')].map(div => div.style.background);
+        rect.style.background = selected.length ? `linear-gradient(to right, ${selected.join(',')})` : '';
+      };
+    });
+
+    // Task 4
+    function addEditableBlock() {
+      const div = document.createElement('div');
+      div.className = 'message';
+      div.innerHTML = '<span contenteditable="false">Текст</span> <button class="edit">Редагувати</button> <button class="delete">Видалити</button>';
+      document.getElementById('editableBlocks').appendChild(div);
+      div.querySelector('.delete').onclick = () => div.remove();
+      div.querySelector('.edit').onclick = () => {
+        const span = div.querySelector('span');
+        span.contentEditable = true;
+        span.focus();
+        span.onblur = () => span.contentEditable = false;
+      };
+    }
+
+    // Task 5
+    const paintCanvas = document.getElementById('paintCanvas');
+    for (let i = 0; i < 100; i++) {
+      const sq = document.createElement('div');
+      sq.className = 'square';
+      sq.onclick = function () {
+        const selected = document.querySelector('#colorPalette .selected');
+        if (selected) this.style.background = selected.style.background;
+      };
+      paintCanvas.appendChild(sq);
+    }
+    document.querySelectorAll('#colorPalette .palette-color').forEach(c => c.onclick = () => {
+      document.querySelectorAll('#colorPalette .palette-color').forEach(x => x.classList.remove('selected'));
+      c.classList.add('selected');
+    });
+
+    // Task 6
+    const cards = document.getElementById('cards');
+    for (let i = 0; i < 5; i++) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = '<div class="card-inner"><div class="card-front"></div><div class="card-back"></div></div>';
+      card.onclick = () => card.classList.toggle('flip');
+      cards.appendChild(card);
+    }
+
+    // Task 7
+     const box = document.getElementById('dragBox');
+    const container = document.getElementById('container');
+    let isDragging = false, offsetX = 0, offsetY = 0;
+
+    box.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      const boxRect = box.getBoundingClientRect();
+      offsetX = e.clientX - boxRect.left;
+      offsetY = e.clientY - boxRect.top;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const containerRect = container.getBoundingClientRect();
+      let x = e.clientX - containerRect.left - offsetX;
+      let y = e.clientY - containerRect.top - offsetY;
+      x = Math.max(0, Math.min(x, container.clientWidth - box.clientWidth));
+      y = Math.max(0, Math.min(y, container.clientHeight - box.clientHeight));
+      box.style.left = `${x}px`;
+      box.style.top = `${y}px`;
+    });
+
+    // Task 8
+    document.getElementById('messageForm').onsubmit = e => {
+      e.preventDefault();
+      const nickname = document.getElementById('nickname').value.trim();
+      const text = document.getElementById('messageText').value.trim();
+      if (!nickname || !text) return;
+      const container = document.getElementById('forumMessages');
+
+      const block = document.createElement('div');
+      block.className = 'forum-message';
+
+      const header = document.createElement('div');
+      header.className = 'forum-header';
+      header.innerHTML = `<span>${nickname}</span><span>${new Date().toLocaleString()}</span>`;
+
+      const body = document.createElement('div');
+      body.className = 'forum-text';
+      body.textContent = text;
+
+      block.appendChild(header);
+      block.appendChild(body);
+
+      container.appendChild(block);
+    };
+
+    // Task 9
+    const books = document.querySelectorAll('#bookList .book');
+    books.forEach(book => {
+      book.onclick = () => {
+        books.forEach(b => b.style.background = '');
+        book.style.background = 'lightgreen';
+      };
+    });
+
+    // Task 10
+    const btn = document.getElementById('escapeBtn');
+    const area = document.getElementById('hoverArea');
+    btn.onmouseenter = () => {
+      const rect = area.getBoundingClientRect();
+      const x = Math.random() * (rect.width - btn.offsetWidth);
+      const y = Math.random() * (rect.height - btn.offsetHeight);
+      btn.style.left = x + 'px';
+      btn.style.top = y + 'px';
+    };
+  </script>
+</body>
+</html>
